@@ -1,3 +1,8 @@
 __pycache__/
 
 .venv/
+
+# Local-only design + agent artifacts
+.superpowers/
+terminalui-design-system-DESIGN.md
+

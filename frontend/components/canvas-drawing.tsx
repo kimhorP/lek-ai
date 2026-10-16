@@ -215,7 +215,7 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className="block cursor-crosshair w-full h-full"
+          className="block w-full h-full"
           style={{ touchAction: 'none' }}
         />
       </div>
