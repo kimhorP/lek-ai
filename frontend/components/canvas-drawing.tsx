@@ -10,6 +10,10 @@ interface CanvasDrawingProps {
   strokes: number[][]
 }
 
+const CANVAS_BG = "#0D0D0D"
+const INK_COLOR = "#00FF41"
+const INK_WIDTH = 3
+
 export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -27,11 +31,11 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
       const containerRect = container.getBoundingClientRect()
       const width = Math.min(containerRect.width - 4, 600) // Max 600px width
       const height = Math.min(width * 0.6, 360) // 60% of width for 5:3 aspect ratio
-      
+
       // Set both the actual canvas size and display size
       canvas.width = width
       canvas.height = height
-      
+
       // Ensure the canvas display size matches exactly
       canvas.style.width = `${width}px`
       canvas.style.height = `${height}px`
@@ -44,13 +48,13 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
       const ctx = canvas.getContext("2d")
       if (!ctx) return
 
-      // Clear canvas with white background
-      ctx.fillStyle = "#ffffff"
+      // Paint the terminal background
+      ctx.fillStyle = CANVAS_BG
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       // Set drawing properties
-      ctx.strokeStyle = "#000000"
-      ctx.lineWidth = 2
+      ctx.strokeStyle = INK_COLOR
+      ctx.lineWidth = INK_WIDTH
       ctx.lineCap = "round"
       ctx.lineJoin = "round"
 
@@ -75,9 +79,9 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     const resizeObserver = new ResizeObserver(() => {
       resizeCanvas()
     })
-    
+
     resizeObserver.observe(container)
-    
+
     return () => {
       resizeObserver.disconnect()
     }
@@ -108,15 +112,15 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     // Calculate the scale factors
     const scaleX = canvasWidth / displayWidth
     const scaleY = canvasHeight / displayHeight
-    
+
     // Convert display coordinates to canvas coordinates
     const x = (clientX - rect.left) * scaleX
     const y = (clientY - rect.top) * scaleY
-    
+
     // Clamp coordinates to canvas bounds
     const clampedX = Math.max(0, Math.min(canvasWidth, x))
     const clampedY = Math.max(0, Math.min(canvasHeight, y))
-    
+
     return { x: clampedX, y: clampedY }
   }
 
@@ -143,8 +147,8 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     if (!ctx) return
 
     // Set drawing properties
-    ctx.strokeStyle = "#000000"
-    ctx.lineWidth = 2
+    ctx.strokeStyle = INK_COLOR
+    ctx.lineWidth = INK_WIDTH
     ctx.lineCap = "round"
     ctx.lineJoin = "round"
 
@@ -163,7 +167,7 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
 
   const handleMouseUp = (e?: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (e) e.preventDefault()
-    
+
     if (isDrawing && currentStroke.length > 0) {
       // Add new stroke to strokes array (currentStroke is already flat)
       const newStrokes = [...strokes, [...currentStroke]]
@@ -192,7 +196,7 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    ctx.fillStyle = "#ffffff"
+    ctx.fillStyle = CANVAS_BG
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     onStrokesChange([])
@@ -201,9 +205,9 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
 
   return (
     <div className="flex flex-col gap-4">
-      <div 
+      <div
         ref={containerRef}
-        className="border-2 border-border rounded-lg overflow-hidden bg-white"
+        className="overflow-hidden border border-input bg-background"
         style={{ width: '100%', maxWidth: '600px', aspectRatio: '5/3' }}
       >
         <canvas
@@ -215,19 +219,14 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className="block w-full h-full"
+          className="block cursor-crosshair w-full h-full"
           style={{ touchAction: 'none' }}
         />
       </div>
 
-      <div className="flex gap-2">
-        <Button onClick={handleClear} variant="outline" className="flex-1 bg-transparent">
-          Clear Canvas
-        </Button>
-        <div className="flex items-center text-sm text-muted-foreground">
-          {strokes.length > 0 && `${strokes.length} stroke${strokes.length !== 1 ? "s" : ""}`}
-        </div>
-      </div>
+      <Button onClick={handleClear} variant="outline" className="w-full">
+        Clear Canvas
+      </Button>
     </div>
   )
 }
