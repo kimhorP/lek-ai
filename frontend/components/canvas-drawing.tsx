@@ -97,58 +97,45 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     }
   }, [strokes, theme])
 
-  const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+  const getCoordinates = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current
     if (!canvas) return null
 
     const rect = canvas.getBoundingClientRect()
-    let clientX: number, clientY: number
-
-    if ("touches" in e) {
-      e.preventDefault() // Prevent scrolling on touch
-      clientX = e.touches[0].clientX
-      clientY = e.touches[0].clientY
-    } else {
-      clientX = e.clientX
-      clientY = e.clientY
-    }
 
     // Get the actual canvas dimensions
     const canvasWidth = canvas.width
     const canvasHeight = canvas.height
-    const displayWidth = rect.width
-    const displayHeight = rect.height
-
-    // Calculate the scale factors
-    const scaleX = canvasWidth / displayWidth
-    const scaleY = canvasHeight / displayHeight
+    const scaleX = canvasWidth / rect.width
+    const scaleY = canvasHeight / rect.height
 
     // Convert display coordinates to canvas coordinates
-    const x = (clientX - rect.left) * scaleX
-    const y = (clientY - rect.top) * scaleY
+    const x = (e.clientX - rect.left) * scaleX
+    const y = (e.clientY - rect.top) * scaleY
 
     // Clamp coordinates to canvas bounds
-    const clampedX = Math.max(0, Math.min(canvasWidth, x))
-    const clampedY = Math.max(0, Math.min(canvasHeight, y))
-
-    return { x: clampedX, y: clampedY }
+    return {
+      x: Math.max(0, Math.min(canvasWidth, x)),
+      y: Math.max(0, Math.min(canvasHeight, y)),
+    }
   }
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     e.preventDefault()
     const coords = getCoordinates(e)
     if (!coords) return
 
+    // Keep tracking even when the finger/cursor leaves the canvas
+    e.currentTarget.setPointerCapture(e.pointerId)
     setIsDrawing(true)
     setCurrentStroke([coords.x, coords.y])
   }
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return
     e.preventDefault()
     const coords = getCoordinates(e)
     if (!coords) return
-
-    if (!isDrawing) return
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -175,9 +162,7 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     setCurrentStroke(prev => [...prev, coords.x, coords.y])
   }
 
-  const handleMouseUp = (e?: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-    if (e) e.preventDefault()
-
+  const handlePointerUp = () => {
     if (isDrawing && currentStroke.length > 0) {
       // Add new stroke to strokes array (currentStroke is already flat)
       const newStrokes = [...strokes, [...currentStroke]]
@@ -185,18 +170,6 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
       setCurrentStroke([])
     }
     setIsDrawing(false)
-  }
-
-  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    handleMouseDown(e as any)
-  }
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    handleMouseMove(e)
-  }
-
-  const handleTouchEnd = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    handleMouseUp(e)
   }
 
   const handleClear = () => {
@@ -222,13 +195,10 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
       >
         <canvas
           ref={canvasRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
           className="block cursor-crosshair w-full h-full"
           style={{ touchAction: 'none' }}
         />
