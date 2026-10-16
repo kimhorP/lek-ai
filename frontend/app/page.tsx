@@ -52,21 +52,21 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="max-w-5xl mx-auto">
+    <main className="flex min-h-screen flex-col bg-background p-4 sm:p-6">
+      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">
         <div className="mb-6 sm:mb-8">
           <h1 className="mb-2 text-[32px] font-bold leading-[1.2] tracking-[0.01em] text-primary">
-            &gt; lek-ai
+            lek-ai
           </h1>
           <p className="text-muted-foreground">
-            // Draw a Khmer handwritten digit to see predictions
+            Draw a Khmer handwritten digit to see predictions
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left side - Canvas */}
           <div className="flex flex-col">
-            <h2 className="mb-4 text-lg font-bold text-primary">--- draw ---</h2>
+            <h2 className="mb-4 text-lg font-bold text-primary">Draw a Digit</h2>
             <CanvasDrawing strokes={strokes} onStrokesChange={setStrokes} />
 
             <Button
@@ -75,18 +75,18 @@ export default function Home() {
               className="mt-4 w-full font-semibold"
               size="lg"
             >
-              {loading ? "> predicting..." : "> Predict"}
+              {loading ? "Predicting..." : "Predict"}
             </Button>
           </div>
 
           {/* Right side - Results */}
           <div className="flex flex-col">
-            <h2 className="mb-4 text-lg font-bold text-primary">--- result ---</h2>
+            <h2 className="mb-4 text-lg font-bold text-primary">Prediction Results</h2>
             <PredictionDisplay result={result} loading={loading} error={error} />
           </div>
         </div>
 
-        <footer className="mt-12 flex items-center justify-center text-muted-foreground">
+        <footer className="mt-auto flex items-center justify-center pt-12 text-muted-foreground">
           <a
             href="https://github.com/kimhorP/lek-ai"
             target="_blank"
