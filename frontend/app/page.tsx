@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Github } from "lucide-react"
 import { CanvasDrawing } from "@/components/canvas-drawing"
 import { PredictionDisplay } from "@/components/prediction-display"
 import { Button } from "@/components/ui/button"
@@ -54,32 +55,49 @@ export default function Home() {
     <main className="min-h-screen bg-background p-4 sm:p-6">
       <div className="max-w-5xl mx-auto">
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-2">lek-ai</h1>
-          <p className="text-muted-foreground">Draw a Khmer handwritten digit to see predictions</p>
+          <h1 className="mb-2 text-[32px] font-bold leading-[1.2] tracking-[0.01em] text-primary">
+            &gt; lek-ai
+          </h1>
+          <p className="text-muted-foreground">
+            // Draw a Khmer handwritten digit to see predictions
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left side - Canvas */}
           <div className="flex flex-col">
-            <h2 className="text-lg font-semibold mb-4 text-foreground">Draw a Digit</h2>
+            <h2 className="mb-4 text-lg font-bold text-primary">--- draw ---</h2>
             <CanvasDrawing strokes={strokes} onStrokesChange={setStrokes} />
 
             <Button
               onClick={handlePredict}
               disabled={loading || strokes.length === 0}
-              className="mt-4 w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+              className="mt-4 w-full font-semibold"
               size="lg"
             >
-              {loading ? "Predicting..." : "Predict"}
+              {loading ? "> predicting..." : "> Predict"}
             </Button>
           </div>
 
           {/* Right side - Results */}
           <div className="flex flex-col">
-            <h2 className="text-lg font-semibold mb-4 text-foreground">Prediction Results</h2>
+            <h2 className="mb-4 text-lg font-bold text-primary">--- result ---</h2>
             <PredictionDisplay result={result} loading={loading} error={error} />
           </div>
         </div>
+
+        <footer className="mt-12 flex items-center justify-center text-muted-foreground">
+          <a
+            href="https://github.com/kimhorP/lek-ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="lek-ai on GitHub"
+            aria-label="lek-ai on GitHub"
+            className="hover:text-primary"
+          >
+            <Github className="size-5" />
+          </a>
+        </footer>
       </div>
     </main>
   )
