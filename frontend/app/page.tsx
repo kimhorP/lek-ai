@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Github } from "lucide-react"
 import { CanvasDrawing } from "@/components/canvas-drawing"
 import { PredictionDisplay } from "@/components/prediction-display"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
@@ -54,13 +55,16 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col bg-background p-4 sm:p-6">
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">
-        <div className="mb-6 sm:mb-8">
-          <h1 className="mb-2 text-[32px] font-bold leading-[1.2] tracking-[0.01em] text-primary">
-            lek-ai
-          </h1>
-          <p className="text-muted-foreground">
-            Draw a Khmer handwritten digit to see predictions
-          </p>
+        <div className="mb-6 flex items-start justify-between sm:mb-8">
+          <div>
+            <h1 className="mb-2 text-[32px] font-bold leading-[1.2] tracking-[0.01em] text-primary">
+              lek-ai
+            </h1>
+            <p className="text-muted-foreground">
+              Draw a Khmer handwritten digit to see predictions
+            </p>
+          </div>
+          <ThemeToggle />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
