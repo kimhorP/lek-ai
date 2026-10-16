@@ -16,8 +16,8 @@ export function PredictionDisplay({ result, loading, error }: PredictionDisplayP
   if (loading) {
     return (
       <Card>
-        <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">Predicting...</p>
+        <CardContent>
+          <p className="text-center text-primary">Predicting...</p>
         </CardContent>
       </Card>
     )
@@ -26,7 +26,7 @@ export function PredictionDisplay({ result, loading, error }: PredictionDisplayP
   if (error) {
     return (
       <Card className="border-destructive bg-destructive/5">
-        <CardContent className="pt-6">
+        <CardContent>
           <p className="text-center text-destructive text-sm">
             <span className="font-semibold">Error:</span> {error}
           </p>
@@ -37,9 +37,11 @@ export function PredictionDisplay({ result, loading, error }: PredictionDisplayP
 
   if (!result) {
     return (
-      <Card className="bg-muted/50">
-        <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">Draw a Khmer digit and click Predict to see results</p>
+      <Card>
+        <CardContent>
+          <p className="text-center text-muted-foreground">
+            Draw a Khmer digit and click Predict to see results
+          </p>
         </CardContent>
       </Card>
     )
@@ -48,7 +50,9 @@ export function PredictionDisplay({ result, loading, error }: PredictionDisplayP
   return (
     <Card className="border-primary bg-primary/5">
       <CardHeader>
-        <CardTitle className="text-center text-6xl">{result.predicted_digit}</CardTitle>
+        <CardTitle className="text-center text-6xl font-bold text-primary">
+          {result.predicted_digit}
+        </CardTitle>
       </CardHeader>
     </Card>
   )
