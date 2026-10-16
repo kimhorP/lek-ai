@@ -5,19 +5,19 @@ import { CanvasDrawing } from "@/components/canvas-drawing"
 import { PredictionDisplay } from "@/components/prediction-display"
 import { Button } from "@/components/ui/button"
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+
 interface PredictionResult {
   predicted_digit: string
-  confidence: number
-  predictions: Array<{ digit: string; confidence: number }>
 }
 
 export default function Home() {
-  const [strokes, setStrokes] = useState<number[][][]>([])
+  const [strokes, setStrokes] = useState<number[][]>([])
   const [result, setResult] = useState<PredictionResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handlePredict = () => {
+  const handlePredict = async () => {
     if (strokes.length === 0) {
       setError("Please draw at least one stroke")
       return
@@ -27,31 +27,38 @@ export default function Home() {
     setError(null)
     setResult(null)
 
-    // Simulate prediction for now
-    setTimeout(() => {
-      setResult({
-        predicted_digit: "៣",
-        confidence: 0.92,
-        predictions: [
-          { digit: "៣", confidence: 0.92 },
-          { digit: "៥", confidence: 0.05 },
-          { digit: "៨", confidence: 0.02 },
-          { digit: "៦", confidence: 0.01 },
-        ],
+    try {
+      const coordinates = strokes.flat()
+      const response = await fetch(`${API_URL}/predict/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coordinates }),
       })
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      setResult({
+        predicted_digit: String.fromCharCode(0x17e0 + data.prediction),
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to get prediction")
+    } finally {
       setLoading(false)
-    }, 500)
+    }
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Khmer Digit Recognition</h1>
+    <main className="min-h-screen bg-background p-4 sm:p-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-2">lek-ai</h1>
           <p className="text-muted-foreground">Draw a Khmer handwritten digit to see predictions</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left side - Canvas */}
           <div className="flex flex-col">
             <h2 className="text-lg font-semibold mb-4 text-foreground">Draw a Digit</h2>

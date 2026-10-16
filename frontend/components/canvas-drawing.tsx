@@ -6,8 +6,8 @@ import { useRef, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 
 interface CanvasDrawingProps {
-  onStrokesChange: (strokes: number[][][]) => void
-  strokes: number[][][]
+  onStrokesChange: (strokes: number[][]) => void
+  strokes: number[][]
 }
 
 export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) {
@@ -15,7 +15,6 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
   const containerRef = useRef<HTMLDivElement>(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [currentStroke, setCurrentStroke] = useState<number[]>([])
-  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null)
 
   // Initialize canvas and handle resize
   useEffect(() => {
@@ -126,7 +125,6 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     const coords = getCoordinates(e)
     if (!coords) return
 
-    console.log(`Mouse down at: ${coords.x}, ${coords.y}`)
     setIsDrawing(true)
     setCurrentStroke([coords.x, coords.y])
   }
@@ -136,12 +134,7 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     const coords = getCoordinates(e)
     if (!coords) return
 
-    // Update mouse position for display
-    setMousePosition({ x: Math.round(coords.x), y: Math.round(coords.y) })
-
     if (!isDrawing) return
-
-    console.log(`Drawing to: ${coords.x}, ${coords.y}`)
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -172,8 +165,6 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     if (e) e.preventDefault()
     
     if (isDrawing && currentStroke.length > 0) {
-      console.log('Stroke completed as flat array:', currentStroke)
-
       // Add new stroke to strokes array (currentStroke is already flat)
       const newStrokes = [...strokes, [...currentStroke]]
       onStrokesChange(newStrokes)
@@ -195,7 +186,6 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
   }
 
   const handleClear = () => {
-    console.log('Canvas cleared')
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -209,28 +199,12 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     setCurrentStroke([])
   }
 
-  const printAllCoordinates = () => {
-    console.log('All strokes as flat coordinate arrays:')
-    strokes.forEach((stroke, strokeIndex) => {
-      console.log(`Stroke ${strokeIndex + 1}: [${stroke.join(', ')}]`)
-    })
-    
-    // Also print in the format you want
-    console.log('\nFlat format for each stroke:')
-    strokes.forEach((stroke, strokeIndex) => {
-      const coordString = stroke.map((coord, i) => 
-        i % 2 === 0 ? `${stroke[i]},${stroke[i + 1]}` : ''
-      ).filter(Boolean).join(',')
-      console.log(`Stroke ${strokeIndex + 1}: ${coordString}`)
-    })
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <div 
         ref={containerRef}
         className="border-2 border-border rounded-lg overflow-hidden bg-white"
-        style={{ width: '100%', maxWidth: '600px', aspectRatio: '5/3' }} // Changed from '1' to '5/3'
+        style={{ width: '100%', maxWidth: '600px', aspectRatio: '5/3' }}
       >
         <canvas
           ref={canvasRef}
@@ -246,18 +220,9 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
         />
       </div>
 
-      {mousePosition && (
-        <div className="text-sm text-muted-foreground">
-          Mouse position: ({mousePosition.x}, {mousePosition.y})
-        </div>
-      )}
-
       <div className="flex gap-2">
         <Button onClick={handleClear} variant="outline" className="flex-1 bg-transparent">
           Clear Canvas
-        </Button>
-        <Button onClick={printAllCoordinates} variant="outline" className="flex-1 bg-transparent">
-          Print Coordinates
         </Button>
         <div className="flex items-center text-sm text-muted-foreground">
           {strokes.length > 0 && `${strokes.length} stroke${strokes.length !== 1 ? "s" : ""}`}
