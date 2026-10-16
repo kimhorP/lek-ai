@@ -7,8 +7,6 @@ import { PredictionDisplay } from "@/components/prediction-display"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-
 interface PredictionResult {
   predicted_digit: string
 }
@@ -31,7 +29,9 @@ export default function Home() {
 
     try {
       const coordinates = strokes.flat()
-      const response = await fetch(`${API_URL}/predict/`, {
+      // Same host that served the page (localhost on PC, LAN IP on phone)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || `http://${window.location.hostname}:8000`
+      const response = await fetch(`${apiUrl}/predict/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ coordinates }),
