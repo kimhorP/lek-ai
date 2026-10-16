@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useRef, useEffect, useState } from "react"
+import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 
 interface CanvasDrawingProps {
@@ -10,15 +11,23 @@ interface CanvasDrawingProps {
   strokes: number[][]
 }
 
-const CANVAS_BG = "#0D0D0D"
-const INK_COLOR = "#00FF41"
+const CANVAS_DARK = { bg: "#0D0D0D", ink: "#00FF41" }
+const CANVAS_LIGHT = { bg: "#F4F4F4", ink: "#171717" }
 const INK_WIDTH = 3
+
+function getCanvasColors() {
+  if (typeof document !== "undefined" && document.documentElement.classList.contains("light")) {
+    return CANVAS_LIGHT
+  }
+  return CANVAS_DARK
+}
 
 export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [currentStroke, setCurrentStroke] = useState<number[]>([])
+  const { theme } = useTheme()
 
   // Initialize canvas and handle resize
   useEffect(() => {
@@ -48,12 +57,13 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
       const ctx = canvas.getContext("2d")
       if (!ctx) return
 
-      // Paint the terminal background
-      ctx.fillStyle = CANVAS_BG
+      // Paint the current theme's background
+      const { bg, ink } = getCanvasColors()
+      ctx.fillStyle = bg
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       // Set drawing properties
-      ctx.strokeStyle = INK_COLOR
+      ctx.strokeStyle = ink
       ctx.lineWidth = INK_WIDTH
       ctx.lineCap = "round"
       ctx.lineJoin = "round"
@@ -85,7 +95,7 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     return () => {
       resizeObserver.disconnect()
     }
-  }, [strokes])
+  }, [strokes, theme])
 
   const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current
@@ -147,7 +157,7 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     if (!ctx) return
 
     // Set drawing properties
-    ctx.strokeStyle = INK_COLOR
+    ctx.strokeStyle = getCanvasColors().ink
     ctx.lineWidth = INK_WIDTH
     ctx.lineCap = "round"
     ctx.lineJoin = "round"
@@ -196,7 +206,7 @@ export function CanvasDrawing({ onStrokesChange, strokes }: CanvasDrawingProps) 
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    ctx.fillStyle = CANVAS_BG
+    ctx.fillStyle = getCanvasColors().bg
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     onStrokesChange([])
