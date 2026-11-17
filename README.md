@@ -7,7 +7,10 @@
 
 Draw a Khmer handwritten digit (០–៩) on a canvas and recognize it with a bidirectional GRU model.
 
-
+<p align="center">
+  <img src="assets/screenshots/app-dark.png" alt="lek-ai dark theme" width="48%" />
+  <img src="assets/screenshots/app-light.png" alt="lek-ai light theme" width="48%" />
+</p>
 
 ## Getting started
 
