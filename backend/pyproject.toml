@@ -1,0 +1,17 @@
+[project]
+name = "lek-ai-backend"
+version = "1.0.0"
+description = "FastAPI + PyTorch bidirectional GRU for Khmer digit recognition"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.128.0",
+    "torch==2.9.1",
+    "pydantic==2.12.5",
+    "uvicorn==0.40.0",
+    "numpy==2.4.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+]
