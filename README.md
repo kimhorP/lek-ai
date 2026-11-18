@@ -7,6 +7,8 @@
 
 Draw a Khmer handwritten digit (០–៩) on a canvas and recognize it with a bidirectional GRU model.
 
+## Demo
+
 <p align="center">
   <img src="assets/screenshots/app-dark.png" alt="lek-ai dark theme" width="48%" />
   <img src="assets/screenshots/app-light.png" alt="lek-ai light theme" width="48%" />
@@ -69,3 +71,11 @@ frontend/
   app/                 Next.js app router (page, layout, styles)
   components/          Canvas drawing, prediction display, theme toggle
 ```
+
+## Credits
+
+The model is based on research conducted in 2025 at the Institute of Technology of Cambodia.
+
+**Team:** Pel Bunkhloem, Pho Rotha, Phoeurn Kimhor, Ty Kana, Va Seyha, Yin Sambat
+
+**Advisor:** Dr. Ngin Kimlong
