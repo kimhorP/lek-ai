@@ -1,11 +1,11 @@
 # lek-ai
 
-![FastAPI](https://img.shields.io/badge/FastAPI-0.128.0-009688?style=flat&logo=fastapi&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.9.1-EE4C2C?style=flat&logo=pytorch&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16.x-000000?style=flat&logo=next.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat&logo=typescript&logoColor=white)
+![ONNX Runtime](https://img.shields.io/badge/ONNX%20Runtime%20Web-1.31-005CED?style=flat&logo=onnx&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.9.1-EE4C2C?style=flat&logo=pytorch&logoColor=white)
 
-Draw a Khmer handwritten digit (០–៩) on a canvas and recognize it with a bidirectional GRU model.
+Draw a Khmer handwritten digit (០–៩) on a canvas and recognize it with a bidirectional GRU model. **Everything runs in the browser** — the model is downloaded once and inference happens locally with WebAssembly. No backend, no server, deployable as a static site.
 
 ## Demo
 
@@ -16,61 +16,46 @@ Draw a Khmer handwritten digit (០–៩) on a canvas and recognize it with a b
 
 ## Getting started
 
-### Backend
-
-```bash
-cd backend
-uv sync
-uv run main.py
-```
-
-The API runs at `http://127.0.0.1:8000` with interactive docs at `/docs`.
-
-To reach it from other devices on your network (e.g. a phone testing the frontend), bind it to the LAN instead:
-
-```bash
-uv run uvicorn main:app --reload --host 0.0.0.0
-```
-
-Run the tests:
-
-```bash
-cd backend
-uv run pytest
-```
-
-### Frontend
-
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`. The app calls the backend on the same host at port `8000`; set `NEXT_PUBLIC_API_URL` if the API lives elsewhere.
+Open `http://localhost:3000`. On first load the app fetches `best_gru_model.onnx` (16.55 MB, served from `public/`) and the WebAssembly runtime; after that every prediction runs entirely client-side.
 
-## API
+## How it works
 
-| Method | Endpoint   | Body                              | Response             |
-| ------ | ---------- | --------------------------------- | -------------------- |
-| `POST` | `/predict/` | `{"coordinates": [x, y, x, y, ...]}` | `{"prediction": 0-9}` |
-
-`coordinates` is the drawing canvas flattened into `[x, y, x, y, ...]`. The server normalizes them and returns the predicted digit class (0–9), which the frontend maps to the Khmer numeral (០–៩).
+1. You draw strokes on the canvas; points are recorded as canvas `[x, y, ...]` pairs.
+2. On **Predict**, `frontend/lib/predict.ts` flattens the strokes, min-max normalizes x and y independently to `[0, 1]`, and packs them into rows of 16 floats (zero-padded at the end).
+3. The `(1, rows, 16)` tensor goes through the ONNX model (bidirectional GRU + attention) in `onnxruntime-web` (WASM, single-threaded — no cross-origin-isolation headers needed).
+4. The argmax over the 10 logits maps to a Khmer numeral via `String.fromCharCode(0x17e0 + digit)`.
 
 ## Project structure
 
 ```
-backend/
-  main.py              FastAPI app, CORS, entrypoint
-  routers/predict.py   POST /predict/ — runs the model
-  model/               DeepGRU model definition + weight loader
-  utils/               Coordinate normalization
-  schemas/             Request/response models
-  best_gru_model.pth   Trained model weights
 frontend/
   app/                 Next.js app router (page, layout, styles)
   components/          Canvas drawing, prediction display, theme toggle
+  lib/predict.ts       In-browser inference: preprocessing + ONNX session
+  public/
+    best_gru_model.onnx  Exported model (downloaded by the browser)
+    ort/                 ONNX Runtime Web WASM files
+tools/                 Model export tooling only — not a server
+  model/               DeepGRU model definition + weight loader
+  best_gru_model.pth   Trained model weights
+  export_onnx.py       .pth -> ONNX export + torch/ORT parity check
 ```
+
+## Updating the model
+
+```bash
+cd tools
+uv sync
+uv run python export_onnx.py
+```
+
+This re-exports `best_gru_model.pth` to `frontend/public/best_gru_model.onnx` and fails unless the ONNX output matches PyTorch's (max logit diff < 1e-3, argmax equal across sequence lengths 16–411).
 
 ## Credits
 

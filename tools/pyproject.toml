@@ -1,0 +1,17 @@
+[project]
+name = "lek-ai-tools"
+version = "1.0.0"
+description = "ONNX export tooling for the Khmer digit GRU model (frontend runs inference)"
+requires-python = ">=3.12"
+dependencies = [
+    "torch==2.9.1",
+    "numpy==2.4.0",
+    "onnx>=1.23.2",
+    "onnxruntime>=1.32.0",
+    "onnxscript>=0.7.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+]
