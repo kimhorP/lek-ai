@@ -75,7 +75,7 @@ export default function Home() {
               className="mt-4 w-full font-semibold"
               size="lg"
             >
-              {loading ? "Predicting..." : "Predict"}
+              {loading ? (modelReady ? "Predicting..." : "Downloading model...") : "Predict"}
             </Button>
           </div>
 
