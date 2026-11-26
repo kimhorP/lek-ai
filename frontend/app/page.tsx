@@ -16,10 +16,12 @@ export default function Home() {
   const [result, setResult] = useState<PredictionResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [modelReady, setModelReady] = useState(false)
 
   useEffect(() => {
     void import("@/lib/predict")
       .then((mod) => mod.preloadModel())
+      .then(() => setModelReady(true))
       .catch(() => {})
   }, [])
 

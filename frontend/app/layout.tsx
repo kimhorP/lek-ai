@@ -5,8 +5,29 @@ import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "lek-ai",
-  description: "Draw a Khmer handwritten digit and recognize it with AI",
+  title: "lek-ai — Khmer Digit Recognition",
+  description: "Draw a Khmer handwritten digit (០–៩) and see it recognized with AI. Runs entirely in your browser — no server needed.",
+  openGraph: {
+    title: "lek-ai — Khmer Digit Recognition",
+    description: "Draw a Khmer handwritten digit and see it recognized with AI. Runs entirely in your browser.",
+    url: "https://lek-ai.workers.dev",
+    siteName: "lek-ai",
+    type: "website",
+    images: [
+      {
+        url: "https://lek-ai.workers.dev/icon.svg",
+        width: 512,
+        height: 512,
+        alt: "lek-ai — Khmer Digit Recognition",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "lek-ai — Khmer Digit Recognition",
+    description: "Draw a Khmer handwritten digit and see it recognized with AI. Runs entirely in your browser.",
+    images: ["https://lek-ai.workers.dev/icon.svg"],
+  },
 }
 
 const jetbrainsMono = JetBrains_Mono({
