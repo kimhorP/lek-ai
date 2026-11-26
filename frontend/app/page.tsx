@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Github } from "lucide-react"
 import { CanvasDrawing } from "@/components/canvas-drawing"
 import { PredictionDisplay } from "@/components/prediction-display"
@@ -17,6 +17,12 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  useEffect(() => {
+    void import("@/lib/predict")
+      .then((mod) => mod.preloadModel())
+      .catch(() => {})
+  }, [])
+
   const handlePredict = async () => {
     if (strokes.length === 0) {
       setError("Please draw at least one stroke")
@@ -28,22 +34,10 @@ export default function Home() {
     setResult(null)
 
     try {
-      const coordinates = strokes.flat()
-      // Same host that served the page (localhost on PC, LAN IP on phone)
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || `http://${window.location.hostname}:8000`
-      const response = await fetch(`${apiUrl}/predict/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ coordinates }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
-      }
-
-      const data = await response.json()
+      const { predictDigit } = await import("@/lib/predict")
+      const digit = await predictDigit(strokes)
       setResult({
-        predicted_digit: String.fromCharCode(0x17e0 + data.prediction),
+        predicted_digit: String.fromCharCode(0x17e0 + digit),
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to get prediction")
